@@ -3,7 +3,9 @@ using dofdir_komek.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using dofdir_komek.DB;
 using dofdir_komek.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace dofdir_komek.Controllers;
 
@@ -14,11 +16,20 @@ public class UserController : ControllerBase
 {
     private readonly JwtService _jwtService;
     private readonly IUserRespository _userRespository;
-    
-    public UserController(JwtService jwtService, IUserRespository userRespository)
+    private readonly AppDBContext _dbContext;
+
+    public UserController(JwtService jwtService, IUserRespository userRespository,
+        AppDBContext dbContext)
     {
-        this._jwtService = jwtService;
-        this._userRespository = userRespository;
+        _jwtService = jwtService;
+        _userRespository = userRespository;
+        _dbContext = dbContext;
+    }
+
+    [HttpGet("users")]
+    public async Task<ActionResult<User>> GetAllUsers()
+    {
+        return Ok(await _dbContext.Users.ToListAsync());
     }
 
     [HttpGet("me")]
